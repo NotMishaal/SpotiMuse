@@ -25,7 +25,9 @@ To get started with this project, you will need to have a Spotify Developer acco
 
 1. Clone the repository to your local machine.
 2. Install the required dependencies by running the following command in your terminal:
-<br>```pip install -r requirements.txt```
+    ```
+    pip install -r requirements.txt
+    ```
 3. Create a config.py file in the data directory of the project and add your Spotify API credentials as follows:
     ```
     client_id = 'your_client_id'
