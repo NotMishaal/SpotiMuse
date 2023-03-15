@@ -1,6 +1,7 @@
 import config
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+import pandas as pd
 
 # sets up the credentials
 client_credentials_manager = SpotifyClientCredentials(config.client_id, config.client_secret)
@@ -32,3 +33,9 @@ for track in tracks:
         track_ids.append(track_id)
 print(track_ids)
 print(len(track_ids))
+
+audio_features = sp.audio_features(track_ids)
+print(audio_features)
+
+df = pd.DataFrame.from_records(audio_features)
+print(df.head())
