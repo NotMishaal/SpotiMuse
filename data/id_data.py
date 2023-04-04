@@ -10,30 +10,33 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 # get playlist_id from user
 def get_playlist():
-    url = input("Enter Playlist URL > \n")
-    playlist_id = url.split('/')[-1].split('?')[0]
-    print(playlist_id)
-    return playlist_id
+    while True:
+        url = input("Enter Playlist URL > \n")
+        playlist_id = url.split('/')[-1].split('?')[0]
+        if playlist_id:
+            print(playlist_id)
+            return playlist_id
+        else:
+            print("Invalid input. Please enter a valid playlist URL.")
 
 
 # gets all the tracks in the playlist
 def get_tracks(playlist_id):
-    results = sp.playlist_items(playlist_id)
-    tracks = results['items']
-    while results['next']:
-        results = sp.next(results)
-        tracks.extend(results['items'])
+    tracks = []
+    try:
+        results = sp.playlist_items(playlist_id)
+        tracks = results['items']
+        while results['next']:
+            results = sp.next(results)
+            tracks.extend(results['items'])
+    except Exception as e:
+        print("Error occurred while fetching playlist tracks:", e)
     return tracks
 
 
 # gets all the track IDs
 def get_track_ids(tracks):
-    track_ids = []
-    for track in tracks:
-        if track['track']:
-            track_id = track['track']['id']
-            track_ids.append(track_id)
-
+    track_ids = [track['track']['id'] for track in tracks if track['track'] and track['track']['id']]
     print(track_ids)
     print(len(track_ids))
     return track_ids
@@ -41,8 +44,13 @@ def get_track_ids(tracks):
 
 # get audio features of the tracks
 def get_audio_features(track_ids):
-    audio_features = sp.audio_features(track_ids)
-    print(audio_features)
+    audio_features = []
+    try:
+        for i in range(0, len(track_ids), 50):
+            features = sp.audio_features(track_ids[i:i+50])
+            audio_features.extend(features)
+    except Exception as e:
+        print("Error occurred while fetching audio features:", e)
     return audio_features
 
 
@@ -50,21 +58,21 @@ def get_audio_features(track_ids):
 def new_df(audio_features, type):
     df = pd.DataFrame.from_records(audio_features)
     if type == 0:  # good songs
-        df.to_csv('data/good_songs.csv')
+        df.to_csv('data/good_songs.csv', index=False)
     else:  # bad songs
-        df.to_csv('data/bad_songs.csv')
+        df.to_csv('data/bad_songs.csv', index=False)
 
 
 # add to existing list (good/bad)
 def existing_df(audio_features, type):
     if type == 0:
-        df = pd.read_csv('data/good_songs.csv')
+        file_path = 'data/good_songs.csv'
     else:
-        df = pd.read_csv('data/bad_songs.csv')
+        file_path = 'data/bad_songs.csv'
 
-    df = df.append(audio_features, ignore_index=True)
-
-    if type == 0:  # good songs
-        df.to_csv('data/good_songs.csv')
-    else:  # bad songs
-        df.to_csv('data/bad_songs.csv')
+    try:
+        df = pd.read_csv(file_path)
+        df = df.append(audio_features, ignore_index=True)
+        df.to_csv(file_path, index=False)
+    except Exception as e:
+        print("Error occurred while updating existing DataFrame:", e)
