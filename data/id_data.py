@@ -47,7 +47,7 @@ def get_audio_features(track_ids):
     audio_features = []
     try:
         for i in range(0, len(track_ids), 50):
-            features = sp.audio_features(track_ids[i:i+50])
+            features = sp.audio_features(track_ids[i:i + 50])
             audio_features.extend(features)
     except Exception as e:
         print("Error occurred while fetching audio features:", e)
@@ -58,17 +58,17 @@ def get_audio_features(track_ids):
 def new_df(audio_features, type):
     df = pd.DataFrame.from_records(audio_features)
     if type == 0:  # good songs
-        df.to_csv('data/good_songs.csv', index=False)
+        df.to_csv('good_songs.csv', index=False)
     else:  # bad songs
-        df.to_csv('data/bad_songs.csv', index=False)
+        df.to_csv('bad_songs.csv', index=False)
 
 
 # add to existing list (good/bad)
 def existing_df(audio_features, type):
     if type == 0:
-        file_path = 'data/good_songs.csv'
+        file_path = 'good_songs.csv'
     else:
-        file_path = 'data/bad_songs.csv'
+        file_path = 'bad_songs.csv'
 
     try:
         df = pd.read_csv(file_path)
@@ -76,3 +76,11 @@ def existing_df(audio_features, type):
         df.to_csv(file_path, index=False)
     except Exception as e:
         print("Error occurred while updating existing DataFrame:", e)
+
+
+if __name__ == "__main__":
+    playlist_id = get_playlist()
+    tracks = get_tracks(playlist_id)
+    track_ids = get_track_ids(tracks)
+    audio_features = get_audio_features(track_ids)
+    new_df(audio_features, 0)  # create new df for good songs
