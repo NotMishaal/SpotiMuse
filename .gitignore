@@ -1,0 +1,4 @@
+.idea
+data/config.py
+data/.cache
+data/__pycache__/
