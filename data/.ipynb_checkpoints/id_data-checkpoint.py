@@ -4,8 +4,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import pandas as pd
 
 # sets up the credentials
-client_credentials_manager = SpotifyClientCredentials(
-    config.client_id, config.client_secret)
+client_credentials_manager = SpotifyClientCredentials(config.client_id, config.client_secret)
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
@@ -37,8 +36,7 @@ def get_tracks(playlist_id):
 
 # gets all the track IDs
 def get_track_ids(tracks):
-    track_ids = [track['track']['id']
-                 for track in tracks if track['track'] and track['track']['id']]
+    track_ids = [track['track']['id'] for track in tracks if track['track'] and track['track']['id']]
     print(track_ids)
     print(len(track_ids))
     return track_ids
@@ -60,9 +58,9 @@ def get_audio_features(track_ids):
 def new_df(audio_features, type):
     df = pd.DataFrame.from_records(audio_features)
     if type == 0:  # good songs
-        df.to_csv('data/good_songs.csv', index=False)
+        df.to_csv('good_songs.csv', index=False)
     else:  # bad songs
-        df.to_csv('data/bad_songs.csv', index=False)
+        df.to_csv('bad_songs.csv', index=False)
 
 
 # add to existing list (good/bad)
@@ -81,14 +79,8 @@ def existing_df(audio_features, type):
 
 
 if __name__ == "__main__":
-    good_playlist_id = get_playlist()
-    g_tracks = get_tracks(good_playlist_id)
-    g_track_ids = get_track_ids(g_tracks)
-    g_audio_features = get_audio_features(g_track_ids)
-    new_df(g_audio_features, 0)  # create new df for good songs
-
-    bad_playlist_id = get_playlist()
-    b_tracks = get_tracks(bad_playlist_id)
-    b_track_ids = get_track_ids(b_tracks)
-    b_audio_features = get_audio_features(b_track_ids)
-    new_df(b_audio_features, 1)  # create new df for bad songs
+    playlist_id = get_playlist()
+    tracks = get_tracks(playlist_id)
+    track_ids = get_track_ids(tracks)
+    audio_features = get_audio_features(track_ids)
+    new_df(audio_features, 0)  # create new df for good songs
